@@ -36,11 +36,7 @@ drop table OSOBA
 /
 
 drop sequence uzemie_seq;
-
-drop sequence don_cinnost_seq;
-drop sequence clen_cinnost_seq;
 drop sequence stretnutie_donov_seq;
-drop sequence don_stretnutie_seq;
 
 
 CREATE TABLE osoba(
@@ -125,10 +121,9 @@ CREATE TABLE cinnost(
 );
 
 CREATE TABLE don_cinnost(
-  id_majitel NUMBER,
   id_cinnost NUMBER,
   id_osoba VARCHAR(10),
-  PRIMARY KEY (id_osoba),
+  PRIMARY KEY (id_osoba,id_cinnost),
   FOREIGN KEY (id_cinnost) REFERENCES cinnost(id_cinnost),
   FOREIGN KEY (id_osoba) REFERENCES don(id_osoba)
 );
@@ -141,22 +136,20 @@ CREATE TABLE stretnutie_donov(
 );
 
 CREATE  TABLE clen_cinnost(
-    id_pracovnici NUMBER,
     id_osoba VARCHAR(10),
     id_cinnost NUMBER,
     FOREIGN KEY (id_osoba) REFERENCES radovy_clen(id_osoba),
     FOREIGN KEY (id_cinnost) REFERENCES cinnost(id_cinnost),
-    PRIMARY KEY (id_pracovnici)
+    PRIMARY KEY (id_osoba,id_cinnost)
 
 );
 
 CREATE TABLE don_stretnutie(
-    id_hostia NUMBER,
     id_stretnutia NUMBER,
     id_osoba VARCHAR(10),
-    PRIMARY KEY (id_hostia),
     FOREIGN KEY (id_stretnutia) REFERENCES stretnutie_donov(id_stretnutie),
-    FOREIGN KEY (id_osoba) REFERENCES don(id_osoba)
+    FOREIGN KEY (id_osoba) REFERENCES don(id_osoba),
+    PRIMARY KEY (id_stretnutia,id_osoba)
 );
 
 
@@ -201,35 +194,13 @@ INSERT INTO cinnost VALUES (1,1,'34 dni',TO_TIMESTAMP('1980-08-04 01:00:00','YYY
 INSERT INTO cinnost VALUES (2,2,'365 dni',TO_TIMESTAMP('1999-08-04 11:00:00','YYYY/MM/DD HH:MI:SS'),'vydieranie');
 
 
+INSERT INTO don_cinnost VALUES (1,'7512315822');
+INSERT INTO don_cinnost VALUES (2,'6203104028');
 
-CREATE SEQUENCE don_cinnost_seq
-START WITH 1 INCREMENT BY 1;
 
-CREATE OR REPLACE TRIGGER don_cinnost_inc
-BEFORE INSERT ON don_cinnost
-FOR EACH ROW
-BEGIN
-SELECT don_cinnost_seq.nextval
-INTO :NEW.id_majitel
-FROM DUAL;
-END;
 
-INSERT INTO don_cinnost VALUES (NULL,1,'7512315822');
-INSERT INTO don_cinnost VALUES (NULL,2,'6203104028');
-
-CREATE SEQUENCE clen_cinnost_seq
-START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER clen_cinnost_inc
-BEFORE INSERT ON clen_cinnost
-FOR EACH ROW
-BEGIN
-SELECT clen_cinnost_seq.nextval
-INTO :NEW.id_pracovnici
-FROM DUAL;
-END;
-
-INSERT INTO clen_cinnost VALUES (NULL, '5603023019', 2);
-INSERT INTO clen_cinnost VALUES (NULL, '985310401', 1);
+INSERT INTO clen_cinnost VALUES ('5603023019', 2);
+INSERT INTO clen_cinnost VALUES ('985310401', 1);
 
 
 INSERT INTO vrazda VALUES (123,'0056085084','985310401', 'Brno',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
@@ -250,19 +221,10 @@ INSERT INTO stretnutie_donov VALUES (NULL,1);
 INSERT INTO stretnutie_donov VALUES (NULL,2);
 
 
-CREATE SEQUENCE don_stretnutie_seq
-START WITH 1 INCREMENT BY 1;
-CREATE OR REPLACE TRIGGER don_stretnutie_inc
-BEFORE INSERT ON don_stretnutie
-FOR EACH ROW
-BEGIN
-SELECT don_stretnutie_seq.nextval
-INTO :NEW.id_hostia
-FROM DUAL;
-END;
 
-INSERT INTO don_stretnutie VALUES (NULL,1,'6203104028');
-INSERT INTO don_stretnutie VALUES (NULL,1,'0056085084');
 
-INSERT INTO don_stretnutie VALUES (NULL,2,'6203104028');
-INSERT INTO don_stretnutie VALUES (NULL,2,'7512315822');
+INSERT INTO don_stretnutie VALUES (1,'6203104028');
+INSERT INTO don_stretnutie VALUES (1,'0056085084');
+
+INSERT INTO don_stretnutie VALUES (2,'6203104028');
+INSERT INTO don_stretnutie VALUES (2,'7512315822');
