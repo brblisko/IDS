@@ -1,0 +1,12 @@
+Jedna sa o informacny system pre organizaciu kriminalnej cinnosti a stretnutia brnenskych rodin, vytvoreny pre mafianov.
+
+Na cele kazdej rodiny je Don, podla priezviska sa potom odvija meno rodiny. Samotna rodina pozostava zo samostatnych
+clenov. Tito clenovia zprostredkovavaju vsetku kriminalnu cinnost (odstraňování nevhodných osob, dealování drog, tisknutí 
+falešných peněz, atd.). Don si nikdy nespini ruky. Kriminalna cinnost prebieha v ramci uzemia, urceneho gps suradnicami,
+adresou, rozlohou, nasledne toto uzemie moze byt rajonom jednej z rodin alebo neutralnym uzemim. Do samostatnej kriminalnej
+cinnosti su potom zapojeni konkretni radovi clenovia v roznych obdobiach (tzn. clen moze zacat den dealovanim drog, nasledne
+po nejakom case prejst na pranie penazi), pricom kazda cinnost je vedena jednou z rodin alebo viacerymi ak su v aliancii. 
+Jednou z hlavnych cinnosti su vrazdy, pri nich je vedene nie len kde boli vykonane, ale aj kto ich vykonal a kto bol cielom/cielmi.
+Niektore z tychto vrazd su objednane samotnymi Donmi, ine su spontanne, bez blizsej objednavky. Cielom vrazdy vsak nikdy nemoze
+byt Don. System pravidelne organizuje stretnutie Donov, prebieha bud v ramci neutralneho uzemia alebo su hostovane jednou z rodin
+System posiela Donom pozvanky a ocakava od nich potvrdenie ucasti.
