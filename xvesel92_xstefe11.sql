@@ -1,3 +1,9 @@
+-------------------------------------------------------------------------------
+-- Authors      xvesel92, xstefe11
+-- Purpose      This script creates and fills database based on ER diagram
+--              from phase 1 and contains SELECTS to fulfill assignment
+--              from phase 3.
+-------------------------------------------------------------------------------
 alter table VRAZDA
     drop constraint ID_OSOBA_VYKONAVATEL
 /
