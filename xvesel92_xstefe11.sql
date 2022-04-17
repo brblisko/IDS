@@ -158,10 +158,14 @@ INSERT INTO osoba VALUES ('5603023019' ,'Frederico Silvester', '00421903399092',
 INSERT INTO osoba VALUES ('985310401' , 'Boris Vesely' ,'00421904349690', 'Namestie pizze 18,Bologna' , 'borisvesely@gmail.com');
 INSERT INTO osoba VALUES ('0056085084' , 'Nina Stefekova', '00420902344567', 'Mafianska ulica 2 ,Chicago' , 'ninastefekova@gmail.com');
 INSERT INTO osoba VALUES ('6203104028' , 'Al Capone', '00420912344548', 'Mafianska ulica 8,Chicago' , 'alcapone123@gmail.com');
+INSERT INTO osoba VALUES ('0904101245' , 'Clovek Ludsky', '00421949210092', 'Vymyslena 10,Brno' , 'clovecina@gmail.com');
+INSERT INTO osoba VALUES ('0105051234', 'Don Bezclenny', '00421949210123','Neexistujuca ulica 420, Slatina','bezclenny@gmail.com');
+
 
 INSERT INTO don VALUES ('7512315822', 'Milano');
 INSERT INTO don VALUES ('0056085084', 'Puchov');
 INSERT INTO don VALUES ('6203104028', 'New York');
+INSERT INTO don VALUES ('0105051234', 'Slatina');
 
 INSERT INTO radovy_clen VALUES ('985310401', '0056085084', '');
 INSERT INTO radovy_clen VALUES ('5603023019', '6203104028', '');
@@ -192,18 +196,40 @@ INSERT INTO aliancia VALUES ( 2,'7512315822','0056085084',TO_TIMESTAMP('2000-06-
 
 INSERT INTO cinnost VALUES (1,1,'34 dni',TO_TIMESTAMP('1980-08-04 01:00:00','YYYY/MM/DD HH:MI:SS'),'kradez');
 INSERT INTO cinnost VALUES (2,2,'365 dni',TO_TIMESTAMP('1999-08-04 11:00:00','YYYY/MM/DD HH:MI:SS'),'vydieranie');
+INSERT INTO cinnost VALUES (3,1,'365 dni',TO_TIMESTAMP('1998-08-04 11:00:00','YYYY/MM/DD HH:MI:SS'),'pranie penazi');
+INSERT INTO cinnost VALUES (4,1,'365 dni',TO_TIMESTAMP('1997-08-04 11:00:00','YYYY/MM/DD HH:MI:SS'),'dovoz cigariet');
+INSERT INTO cinnost VALUES (5,2,'365 dni',TO_TIMESTAMP('1996-08-04 11:00:00','YYYY/MM/DD HH:MI:SS'),'predaj ukradnuteho');
+INSERT INTO cinnost VALUES (6,2,'365 dni',TO_TIMESTAMP('1995-08-04 11:00:00','YYYY/MM/DD HH:MI:SS'),'predaj alkoholu');
+INSERT INTO cinnost VALUES (7,2,'365 dni',TO_TIMESTAMP('2001-12-15 11:15:52','YYYY/MM/DD HH:MI:SS'),'pasovanie do vezenia');
+
+
 
 
 INSERT INTO don_cinnost VALUES (1,'7512315822');
+INSERT INTO don_cinnost VALUES (3,'7512315822');
+INSERT INTO don_cinnost VALUES (4,'7512315822');
+
 INSERT INTO don_cinnost VALUES (2,'6203104028');
+INSERT INTO don_cinnost VALUES (5,'6203104028');
+INSERT INTO don_cinnost VALUES (6,'6203104028');
+INSERT INTO don_cinnost VALUES (7,'6203104028');
 
 
 
 INSERT INTO clen_cinnost VALUES ('5603023019', 2);
+INSERT INTO clen_cinnost VALUES ('5603023019', 5);
+INSERT INTO clen_cinnost VALUES ('5603023019', 6);
+INSERT INTO clen_cinnost VALUES ('5603023019', 7);
+
+
 INSERT INTO clen_cinnost VALUES ('985310401', 1);
+INSERT INTO clen_cinnost VALUES ('985310401', 3);
+INSERT INTO clen_cinnost VALUES ('985310401', 4);
 
 
 INSERT INTO vrazda VALUES (123,'0056085084','985310401', 'Brno',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+INSERT INTO radovy_clen VALUES ('0904101245', '7512315822', 123);
+
 
 CREATE SEQUENCE stretnutie_donov_seq
 START WITH 1 INCREMENT BY 1;
