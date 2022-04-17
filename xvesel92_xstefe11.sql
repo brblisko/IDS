@@ -254,3 +254,47 @@ INSERT INTO don_stretnutie VALUES (1,'0056085084');
 
 INSERT INTO don_stretnutie VALUES (2,'6203104028');
 INSERT INTO don_stretnutie VALUES (2,'7512315822');
+
+-- vypise vsetkych donov a ich podriadenych
+SELECT o.id_osoba AS id_dona,o.meno AS meno_dona,
+       (SELECT K.meno FROM radovy_clen H, osoba K
+       WHERE H.id_osoba = K.id_osoba AND d.id_osoba = H.id_osoba_nadriadeny) AS meno_podriadeny
+FROM don d, osoba o
+WHERE  o.id_osoba = d.id_osoba;
+
+-- vypise vsetky vrazdy a ich majitelov s vykonavatelmi a cielmi
+SELECT V.id_vrazda, o.meno AS majitel,
+       (SELECT K.meno FROM osoba K, vrazda H
+       WHERE K.id_osoba = H.id_osoba_vykonavatel AND V.id_osoba_vykonavatel = K.id_osoba) AS vykonavatel,
+       V.cas, V.miesto, (SELECT Q.meno FROM osoba Q WHERE Q.id_osoba = R.id_osoba) AS meno_ciela
+FROM osoba O, vrazda V, radovy_clen R
+WHERE O.id_osoba = V.id_osoba_majitel AND R.id_vrazdy = V.id_vrazda;
+
+-- vypise vsetkych donov a ich celkovu vlastnenu rozlohu uzemia
+SELECT O.meno AS meno_dona, SUM(U.rozloha) AS celkova_rozloha
+FROM osoba O, don D, uzemie U
+WHERE O.id_osoba = D.id_osoba AND D.id_osoba = U.id_osoba GROUP BY O.meno;
+
+-- vypise vsetkych donov a spocita ich vlastnene cinnosti
+SELECT O.meno AS meno_dona, COUNT(*) AS pocet_cinnosti
+FROM osoba O,don D, cinnost C, don_cinnost P
+WHERE O.id_osoba = D.id_osoba AND P.id_osoba = D.id_osoba AND P.id_cinnost = C.id_cinnost GROUP BY O.meno;
+
+-- spocita hosti na jednotlivych stretnutiach donov
+SELECT S.id_stretnutie, COUNT(*) AS pocet_hosti
+FROM stretnutie_donov S, don_stretnutie K
+WHERE S.id_stretnutie = K.id_stretnutia GROUP BY S.id_stretnutie;
+
+-- vypise donov ktory nemaju clena
+SELECT O.meno
+FROM osoba O, don D
+WHERE O.id_osoba = D.id_osoba AND NOT EXISTS(SELECT * FROM radovy_clen R WHERE D.id_osoba = R.id_osoba_nadriadeny)
+GROUP BY O.meno;
+
+-- vypise vsetkych radovych clenov ktorych donovia sa zucastnia stretnutia
+SELECT O.meno, O.domaca_adresa, O.tel_cislo, O.email, R.id_osoba_nadriadeny
+FROM radovy_clen R, osoba O
+WHERE id_osoba_nadriadeny IN (SELECT id_osoba FROM don_stretnutie) AND O.id_osoba = R.id_osoba
+
+
+
