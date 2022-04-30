@@ -300,7 +300,24 @@ GROUP BY O.meno;
 -- vypise vsetkych radovych clenov ktorych donovia sa zucastnia stretnutia
 SELECT O.meno, O.domaca_adresa, O.tel_cislo, O.email, R.id_osoba_nadriadeny
 FROM radovy_clen R, osoba O
-WHERE id_osoba_nadriadeny IN (SELECT id_osoba FROM don_stretnutie) AND O.id_osoba = R.id_osoba
+WHERE id_osoba_nadriadeny IN (SELECT id_osoba FROM don_stretnutie) AND O.id_osoba = R.id_osoba;
+
+
+-- 4. cast--
+
+
+--prava--
+GRANT ALL ON ALIANCIA TO XVESEL92;
+GRANT ALL ON DON_CINNOST TO XVESEL92;
+GRANT ALL ON CLEN_CINNOST TO XVESEL92;
+GRANT ALL ON RADOVY_CLEN TO XVESEL92;
+GRANT ALL ON VRAZDA TO XVESEL92;
+GRANT ALL ON CINNOST TO XVESEL92;
+GRANT ALL ON DON_STRETNUTIE TO XVESEL92;
+GRANT ALL ON STRETNUTIE_DONOV TO XVESEL92;
+GRANT ALL ON UZEMIE TO XVESEL92;
+GRANT ALL ON DON TO XVESEL92;
+GRANT ALL ON OSOBA TO XVESEL92;
 
 
 
