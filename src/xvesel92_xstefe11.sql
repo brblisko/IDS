@@ -444,3 +444,31 @@ end;
 BEGIN
      percentualne_vlastnenie_uzemia();
 END;
+
+-- trigger na kontrolu ci je datum v buducnosti ak datum nie je zadany je vrazda naplanovana o tyzden
+CREATE OR REPLACE TRIGGER kontrola_datum
+    BEFORE INSERT OR UPDATE OF cas on vrazda
+    FOR EACH ROW
+    BEGIN
+        if (:NEW.cas is NULL)then
+            :NEW.cas:=current_timestamp + 7;
+        end if;
+        IF(:NEW.cas < CURRENT_TIMESTAMP) then
+            raise_application_error(-20001,'cas vo vrazde musi byt v buducnosti');
+        end if;
+    end;
+
+-- demonstracia
+
+--prejde
+INSERT INTO vrazda VALUES (25,'0056085084','9853104010', 'Talianska 5, Chicago',TO_TIMESTAMP('2023-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+--prida jeden tyzden
+INSERT INTO vrazda VALUES (1215,'0056085084','9853104010', 'Talianska 5, Chicago',NULL);
+--neprejde
+INSERT INTO vrazda VALUES (1512,'0056085084','9853104010', 'Talianska 5, Chicago',TO_TIMESTAMP('2020-12-15 11:00:00','YYYY/MM/DD HH:MI:SS'));
+
+
+select * from vrazda;
+
+
+
