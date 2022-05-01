@@ -161,7 +161,7 @@ CREATE TABLE don_stretnutie(
 
 INSERT INTO osoba VALUES ('7512315822', 'Don Lasagna', '00420991232112','Cestovinova ulica 120, Rim','najlepsidon@gmail.com');
 INSERT INTO osoba VALUES ('5603023019' ,'Frederico Silvester', '00421903399092', 'Pizzova ulica 13,Milano' , 'najomnyzabijak@gmail.com');
-INSERT INTO osoba VALUES ('985310401' , 'Boris Vesely' ,'00421904349690', 'Namestie pizze 18,Bologna' , 'borisvesely@gmail.com');
+INSERT INTO osoba VALUES ('9853104010' , 'Boris Vesely' ,'00421904349690', 'Namestie pizze 18,Bologna' , 'borisvesely@gmail.com');
 INSERT INTO osoba VALUES ('0056085084' , 'Nina Stefekova', '00420902344567', 'Mafianska ulica 2 ,Chicago' , 'ninastefekova@gmail.com');
 INSERT INTO osoba VALUES ('6203104028' , 'Al Capone', '00420912344548', 'Mafianska ulica 8,Chicago' , 'alcapone123@gmail.com');
 INSERT INTO osoba VALUES ('0904101245' , 'Clovek Ludsky', '00421949210092', 'Vymyslena 10,Brno' , 'clovecina@gmail.com');
@@ -283,6 +283,7 @@ SELECT V.id_vrazda, o.meno AS majitel,
 FROM osoba O, vrazda V, radovy_clen R
 WHERE O.id_osoba = V.id_osoba_majitel AND R.id_vrazdy = V.id_vrazda;
 
+
 -- vypise vsetkych donov a ich celkovu vlastnenu rozlohu uzemia
 SELECT O.meno AS meno_dona, SUM(U.rozloha) AS celkova_rozloha
 FROM osoba O, don D, uzemie U
@@ -326,6 +327,7 @@ GRANT ALL ON UZEMIE TO XVESEL92;
 GRANT ALL ON DON TO XVESEL92;
 GRANT ALL ON OSOBA TO XVESEL92;
 
+COMMIT;
 --explain plan
 
 -- DROP index indx;
@@ -347,14 +349,96 @@ SELECT * FROM TABLE(dbms_xplan.display);
 
 
 --material view--
+--
+-- DROP MATERIALIZED VIEW myView;
+-- CREATE MATERIALIZED VIEW LOG ON STRETNUTIE_DONOV with PRIMARY KEY INCLUDING NEW VALUES;
+--
+-- CREATE MATERIALIZED VIEW myView
+--     update on commit
+--     BUILD IMMEDIATE
+--     as
+--     SELECT XSTEFE11.stretnutie_donov.id_stretnutie, COUNT(*) AS pocet_hosti
+--     FROM XSTEFE11.stretnutie_donov S, XSTEFE11.don_stretnutie K
+--     WHERE S.id_stretnutie = K.id_stretnutia GROUP BY S.id_stretnutie;
+--
+-- COMMIT;
+-- SELECT * FROM myView;
 
-DROP MATERIALIZED VIEW myView;
-CREATE MATERIALIZED VIEW LOG ON STRETNUTIE_DONOV with PRIMARY KEY INCLUDING NEW VALUES;
+-- procedury --
 
-CREATE MATERIALIZED VIEW myView
-    as
-    SELECT S.id_stretnutie, COUNT(*) AS pocet_hosti
-    FROM stretnutie_donov S, don_stretnutie K
-    WHERE S.id_stretnutie = K.id_stretnutia GROUP BY S.id_stretnutie;
+CREATE OR REPLACE PROCEDURE priemerny_vek_donov
+IS
+    CURSOR donovia IS SELECT * FROM don;
+    d don%rowtype;
+    cnt NUMBER;
+    cntSum NUMBER;
+    vek NUMBER;
+    rok NUMBER;
+    BEGIN
+        cnt := 0;
+        cntSum := 0;
+        vek := 0;
+        rok := 0;
+        OPEN donovia;
+        LOOP
+            fetch donovia into d;
+            exit when donovia%NOTFOUND;
+            cnt := cnt + 1;
+            rok := SUBSTR(d.id_osoba,1,2);
+            IF (rok > 23) THEN
+                rok := 1900 + rok;
+            ELSE
+                rok := 2000 + rok;
+            end IF;
+            vek := 2022 - rok;
+            cntSum := cntSum + vek;
+        end loop;
+        IF (cnt = 0) THEN
+            raise_application_error(-20001,'nenasli sa ziadny donovia' );
+        end if;
+        DBMS_OUTPUT.PUT_LINE('Priemerny vek donov je: '|| round((cntSUM/cnt), 2));
+end;
+/
+BEGIN
+     PRIEMERNY_VEK_DONOV();
+END;
 
-SELECT * FROM myView;
+
+CREATE OR REPLACE PROCEDURE percentualne_vlastnenie_uzemia
+    is
+    cursor donovia is select * from don;
+    d don%rowtype;
+    rozloha_celkom number;
+    rozloha_don number;
+    cnt number;
+    menoDon varchar(64);
+begin
+    OPEN donovia;
+    rozloha_celkom := 0;
+    select SUM(rozloha) into rozloha_celkom from uzemie;
+    if (rozloha_celkom = 0) THEN
+            raise_application_error(-20001,'nenasli sa ziadne uzemia');
+    end if;
+    LOOP
+        cnt := 0;
+        rozloha_don := 0;
+        fetch donovia into d;
+        exit when donovia%NOTFOUND;
+        select count(*) into cnt from uzemie U where d.id_osoba=U.id_osoba;
+        if(cnt != 0) then
+            select SUM(U.rozloha) into rozloha_don from uzemie U where d.id_osoba=U.id_osoba;
+        end if;
+        select O.meno into menoDon from osoba O where d.id_osoba=O.id_osoba;
+        if(rozloha_don = 0)then
+            DBMS_OUTPUT.PUT_LINE(menoDon || ': 0%');
+        else
+            DBMS_OUTPUT.PUT_LINE(menoDon || ': ' || round(((rozloha_don*100)/rozloha_celkom),2)||'%');
+        end if;
+    end loop;
+end;
+/
+
+
+BEGIN
+     percentualne_vlastnenie_uzemia();
+END;
