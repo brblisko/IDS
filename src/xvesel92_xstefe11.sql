@@ -194,7 +194,8 @@ END;
 
 INSERT INTO uzemie VALUES (NULL,'7512315822',32,'43.156,-75.844', 'Little Italy 34, New York');
 INSERT INTO uzemie VALUES (NULL,'0056085084',17,'43.156,-75.844', 'Pizzova Ulica 4, Milano');
-INSERT INTO uzemie VALUES (NULL,'6203104028',23,'43.156,-75.844', ' Talianska 5, Chicago');
+INSERT INTO uzemie VALUES (NULL,'6203104028',23,'43.156,-75.844', 'Talianska 5, Chicago');
+
 
 
 INSERT INTO aliancia VALUES ( 2,'7512315822','0056085084',TO_TIMESTAMP('2000-06-04 12:00:00','YYYY/MM/DD HH:MI:SS'),TO_TIMESTAMP('2005-08-04 03:00:00','YYYY/MM/DD HH:MI:SS'));
@@ -234,6 +235,12 @@ INSERT INTO clen_cinnost VALUES ('985310401', 4);
 
 
 INSERT INTO vrazda VALUES (123,'0056085084','985310401', 'Brno',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+INSERT INTO vrazda VALUES (124,'0056085084','985310401', 'Little Italy 34, New York',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+INSERT INTO vrazda VALUES (125,'0056085084','985310401', 'Pizzova Ulica 4, Milano',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+INSERT INTO vrazda VALUES (126,'0056085084','985310401', 'Talianska 5, Chicago',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+INSERT INTO vrazda VALUES (127,'0056085084','985310401', 'Talianska 5, Chicago',TO_TIMESTAMP('2020-01-01 11:00:00','YYYY/MM/DD HH:MI:SS'));
+
+
 INSERT INTO radovy_clen VALUES ('0904101245', '7512315822', 123);
 
 
@@ -271,7 +278,7 @@ WHERE  o.id_osoba = d.id_osoba;
 -- vypise vsetky vrazdy a ich majitelov s vykonavatelmi a cielmi
 SELECT V.id_vrazda, o.meno AS majitel,
        (SELECT K.meno FROM osoba K, vrazda H
-       WHERE K.id_osoba = H.id_osoba_vykonavatel AND V.id_osoba_vykonavatel = K.id_osoba) AS vykonavatel,
+       WHERE K.id_osoba = H.id_osoba_vykonavatel AND V.id_osoba_vykonavatel = K.id_osoba AND H.id_vrazda = V.id_vrazda) AS vykonavatel,
        V.cas, V.miesto, (SELECT Q.meno FROM osoba Q WHERE Q.id_osoba = R.id_osoba) AS meno_ciela
 FROM osoba O, vrazda V, radovy_clen R
 WHERE O.id_osoba = V.id_osoba_majitel AND R.id_vrazdy = V.id_vrazda;
@@ -319,5 +326,35 @@ GRANT ALL ON UZEMIE TO XVESEL92;
 GRANT ALL ON DON TO XVESEL92;
 GRANT ALL ON OSOBA TO XVESEL92;
 
+--explain plan
+
+-- DROP index indx;
+explain plan for
+SELECT uzemie.adresa, COUNT(vrazda.miesto) AS pocet_vrazd
+FROM vrazda JOIN uzemie ON vrazda.miesto=uzemie.adresa
+GROUP BY uzemie.adresa
+ORDER BY pocet_vrazd DESC;
+SELECT * FROM TABLE(dbms_xplan.display);
+
+create index indx ON vrazda (miesto);
+
+explain plan for
+SELECT uzemie.adresa, COUNT(vrazda.miesto) AS pocet_vrazd
+FROM vrazda JOIN uzemie ON vrazda.miesto=uzemie.adresa
+GROUP BY uzemie.adresa
+ORDER BY pocet_vrazd DESC;
+SELECT * FROM TABLE(dbms_xplan.display);
 
 
+--material view--
+
+DROP MATERIALIZED VIEW myView;
+CREATE MATERIALIZED VIEW LOG ON STRETNUTIE_DONOV with PRIMARY KEY INCLUDING NEW VALUES;
+
+CREATE MATERIALIZED VIEW myView
+    as
+    SELECT S.id_stretnutie, COUNT(*) AS pocet_hosti
+    FROM stretnutie_donov S, don_stretnutie K
+    WHERE S.id_stretnutie = K.id_stretnutia GROUP BY S.id_stretnutie;
+
+SELECT * FROM myView;
