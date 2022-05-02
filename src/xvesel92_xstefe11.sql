@@ -471,4 +471,39 @@ INSERT INTO vrazda VALUES (1512,'0056085084','9853104010', 'Talianska 5, Chicago
 select * from vrazda;
 
 
+-- trigger
+CREATE OR REPLACE TRIGGER kontrola_clen_cinnost
+    BEFORE INSERT OR UPDATE OF id_osoba on CLEN_CINNOST
+    FOR EACH ROW
+    DECLARE
+        cnt NUMBER;
+        tmp varchar(64);
+    BEGIN
+        SELECT count(*) into cnt FROM clen_cinnost where clen_cinnost.id_osoba = :NEW.id_osoba;
+        SELECT id_osoba_nadriadeny into tmp FROM radovy_clen where :NEW.id_osoba = radovy_clen.id_osoba;
+        if(cnt >= 2)then
+            raise_application_error(-20001,'clen nemoze vykonavat viac ako 2 cinnosti');
+        end if;
+        IF(tmp is null)then
+            raise_application_error(-20001,'clen nemoze vykonavat cinnost bez nadriadeneho');
+        end if;
+    end;
 
+-- demonstracia
+
+INSERT INTO osoba VALUES ('1512025432', 'Pokusny Kralik', '00421949210123','adressa pokusna testovacia 28','testing1512@gmail.com');
+INSERT INTO radovy_clen VALUES ('1512025432', NULL, '');
+
+-- neprejde, nema nadriadeneho
+INSERT INTO clen_cinnost VALUES ('1512025432', 1);
+
+UPDATE radovy_clen
+set id_osoba_nadriadeny = '0056085084'
+where id_osoba = '1512025432';
+
+-- prejde lebo vykonava iba 2
+INSERT INTO clen_cinnost VALUES ('1512025432', 5);
+INSERT INTO clen_cinnost VALUES ('1512025432', 6);
+
+-- neprejde
+INSERT INTO clen_cinnost VALUES ('1512025432', 7);
